@@ -1,6 +1,6 @@
 # Sentora SSO Client
 
-This library aids the generation of SSO tokens and single sign-on links/buttons for use with Supared's SSO module for the [Sentora](http://sentora.org) web hosting control panel.
+This library aids the generation of SSO tokens and single sign-on links/buttons for use with the [Supared](http://supared.com) SSO module for the [Sentora](http://sentora.org) web hosting control panel.
 
 Requirements
 ------------

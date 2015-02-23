@@ -13,6 +13,9 @@ use Supared\Sentora\SingleSignOnClient\Utils\Validator as Validate;
 class Token
 {
 
+    /**
+     * The SSO URL string layout.
+     */
     const URL_STRING_PARAMS = "ssoToken=%s&ssoInit=%s";
 
     /**
@@ -60,7 +63,7 @@ class Token
     public function getTokenUrl($target_server)
     {
         Validate::serverTargetAddress($target_server);
-        return rtrim($target_server, '/') . "/?" . sprintf(self::URL_STRING_PARAMS, $this->getToken(), $this->getIv());
+        return rtrim($target_server, '/') . '/?' . sprintf(self::URL_STRING_PARAMS, $this->getToken(), $this->getIv());
     }
 
     /**
@@ -71,9 +74,26 @@ class Token
      */
     public function getSsoLink($target_server, $link_text = 'Login', $target_blank = true, $attributes = [])
     {
-        
+
+        $link_attributes = '';
+        if (count($attributes) > 0) {
+            $attr_string = '';
+            foreach ($attributes as $attribute => $value) {
+                $attr_string .= sprintf("%s=\"%s\" ", $attribute, $value);
+            }
+            $link_attributes = ' ' . trim($attr_string);
+        }
+        $link_target = '';
+        if ($target_blank) {
+            $link_target = ' target="_blank"';
+        }
+        return '<a href="' . $this->getTokenUrl($target_server) . '"' . $link_target . $link_attributes . '>' . $link_text . '</a>';
     }
 
+    /**
+     * The standard 'toString()' method, will output the SSO token only (no IV!)
+     * @return type
+     */
     public function __toString()
     {
         return $this->token;

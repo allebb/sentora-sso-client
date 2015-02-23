@@ -19,7 +19,7 @@ $sso = SSOClient::create($settings['key']);
 
 // We now generate the token with the given user credentials and request a HTML
 // formatted link to our Sentora control panel url:
-$ssoLink = $sso->generate($user['id'], $user['name'])->getTokenUrl($settings['sentora_base_url']);
+$ssoLink = $sso->generate($user['id'], $user['name'])->getSsoLink($settings['sentora_base_url'], 'Login now!', false, ['class' => 'btn btn-primary', 'id' => 'sso-link']);
 
 // You can now use the link like so (ideally you'd output this in your view but this is
 // just an example, of simply echo'ing our the generated HTML link):
