@@ -4,7 +4,7 @@
     "description": "A client library for generating SSO tokens and login buttons/links for the Sentora web hosting control panel.",
     "type": "library",
     "keywords": ["sentora", "zpanel", "sso", "token"],
-    "license": "GPLv2",
+    "license": "GPL-2.0",
     "authors": [
         {
             "name": "Bobby Allen",
@@ -13,8 +13,13 @@
             "role": "Developer"
         }
     ],
+    "support": {
+        "email": "support@supared.com",
+        "issues": "https://github.com/supared/sentora-sso-client/issues"
+    },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "ext-mcrypt": "*"
     },
     "autoload": {
         "psr-4": {
