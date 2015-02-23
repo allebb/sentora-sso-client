@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Supared\\Sentora\\SSO-Client\\": "src/"
+            "Supared\\Sentora\\SingleSignOnClient\\": "src/"
         }
     }
 }
