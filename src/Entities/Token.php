@@ -2,10 +2,18 @@
 
 use Supared\Sentora\SingleSignOnClient\Utils\Validator as Validate;
 
+/**
+ * Sentora SSO Module Client - A PHP SSO Token and passthru generation library.
+ * @author Bobby Allen (ballen@bobbyallen.me)
+ * @copyright (c) 2015, Supared Limited
+ * @link https://github.com/supared/sentora-sso-client
+ * @license https://github.com/supared/sentora-sso-client/blob/master/LICENSE
+ * @version 1.0.0
+ */
 class Token
 {
 
-    const URL_STRING_PARAMS = "ssoServInit=%s&ssoToken=%s";
+    const URL_STRING_PARAMS = "ssoToken=%s&ssoInit=%s";
 
     /**
      * The generated (encrypted) token string.
@@ -14,15 +22,15 @@ class Token
     private $token;
 
     /**
-     * The target server's init auth key.
+     * The initiation vector to use.
      * @var string
      */
-    private $server_init;
+    private $iv;
 
-    public function __construct($token, $server_init_auth)
+    public function __construct($token, $iv)
     {
         $this->token = $token;
-        $this->server_init = $server_init_auth;
+        $this->iv = $iv;
     }
 
     /**
@@ -38,9 +46,9 @@ class Token
      * Returns the Sentora server init string.
      * @return string
      */
-    public function getServerInit()
+    public function getIv()
     {
-        return $this->server_init;
+        return $this->iv;
     }
 
     /**
@@ -52,7 +60,7 @@ class Token
     public function getTokenUrl($target_server)
     {
         Validate::serverTargetAddress($target_server);
-        return rtrim($target_server, '/') . "?" . sprintf(self::URL_STRING_PARAMS, $this->getServerInit(), $this->getToken());
+        return rtrim($target_server, '/') . "/?" . sprintf(self::URL_STRING_PARAMS, $this->getToken(), $this->getIv());
     }
 
     /**
@@ -61,7 +69,7 @@ class Token
      * @param string $target_blank Open the Sentora CP session in a new browser window?
      * @param string $attributes Additonal HTML link attirbutes eg. 'class', 'id' etc.
      */
-    public function getSsoLink($target_server, $target_blank = true, $attributes = [])
+    public function getSsoLink($target_server, $link_text = 'Login', $target_blank = true, $attributes = [])
     {
         
     }

@@ -2,31 +2,31 @@
 
 use Supared\Sentora\SingleSignOnClient\Entities\Token;
 use Supared\Sentora\SingleSignOnClient\Utils\Validator as Validate;
+use Supared\Sentora\SingleSignOnClient\Utils\IvGenerator;
 
+/**
+ * Sentora SSO Module Client - A PHP SSO Token and passthru generation library.
+ * @author Bobby Allen (ballen@bobbyallen.me)
+ * @copyright (c) 2015, Supared Limited
+ * @link https://github.com/supared/sentora-sso-client
+ * @license https://github.com/supared/sentora-sso-client/blob/master/LICENSE
+ * @version 1.0.0
+ */
 class Client
 {
 
-    const CRYPTO_CIPHER = MCRYPT_3DES;
-    const CRYPTO_MODE = MCRYPT_MODE_CBC;
-
-    /**
-     * The target server's auth init key
-     * @var string 
-     */
-    private $server_init;
-    
     /**
      * The encryption key as set in the Sentora SSO module.
      * @var string
      */
     private $key;
-    
+
     /**
-     * The initiation vector as set in the Sentora SSO module.
+     * Used to store the generated IV for each SSO token request.
      * @var string
      */
     private $iv;
-    
+
     /**
      * A timestamp value specify until which date this token can authenticate and
      * provide SSO authentication till (format YYYYMMDDHHMM)
@@ -40,36 +40,13 @@ class Client
     }
 
     /**
-     * Set the server init key.
-     * @param string $auth
-     * @return \Supared\Sentora\SingleSignOnClient\Client
-     */
-    public function setServerInitKey($auth)
-    {
-        Validate::serverInitAuth($auth);
-        $this->server_init = $auth;
-        return $this;
-    }
-
-    /**
      * Set the corresponding encryption key that is also set on the Sentora server.
      * @param string $key
      * @return \Supared\Sentora\SingleSignOnClient\Client
      */
     public function setKey($key)
     {
-        $this->key = $key;
-        return $this;
-    }
-
-    /**
-     * Set the initiation vector as also set on the Sentora server.
-     * @param string $iv
-     * @return \Supared\Sentora\SingleSignOnClient\Client
-     */
-    public function setIv($iv)
-    {
-        $this->iv = $iv;
+        $this->key = static::hexToAscii($key);
         return $this;
     }
 
@@ -87,6 +64,15 @@ class Client
     }
 
     /**
+     * Return the generated IV.
+     * @return string
+     */
+    public function getIv()
+    {
+        return $this->iv;
+    }
+
+    /**
      * Generate the token and return the Token entity object to enable
      * output as string, URLs and HTML links.
      * @return \Supared\Sentora\SingleSignOnClient\Entities\Token
@@ -95,9 +81,9 @@ class Client
     {
         Validate::username($username);
         Validate::uid($uid);
-        // Generate the SSO token and then we'll pass it to the Token entity..
+        $this->generateIv();
         $token = $this->encryptToken($uid, $username);
-        return new Token($token, $this->server_init);
+        return new Token($token, $this->getIv());
     }
 
     /**
@@ -112,10 +98,39 @@ class Client
         }
     }
 
+    /**
+     * Constructs and encrypts the data to a 3DES encrypted string.
+     * @param int $uid
+     * @param string $username
+     * @return string
+     */
     private function encryptToken($uid, $username)
     {
         $build = sprintf("uid=%u&user=%s&validtill=%s", $uid, $username, $this->valid_till);
-        $encrypt = mcrypt_encrypt(self::CRYPTO_MODE, $this->key, $data, self::CRYPTO_MODE, $this->iv);
+        $encrypt = mcrypt_encrypt(MCRYPT_3DES, $this->key, $build, MCRYPT_MODE_CBC, static::hexToAscii($this->getIv()));
         return bin2hex($encrypt);
+    }
+
+    /**
+     * Converts Hexidecimal strings to ASCII.
+     * @return string
+     */
+    private static function hexToAscii($hex)
+    {
+        $ascii = "";
+        $clean_hex = str_replace(' ', '', $hex);
+        for ($i = 0; $i < strlen($clean_hex); $i = $i + 2) {
+            $ascii .= chr(hexdec(substr($clean_hex, $i, 2)));
+        }
+        return $ascii;
+    }
+
+    /**
+     * Generates and sets an initiation vector (IV) for the client.
+     * @return void
+     */
+    private function generateIv()
+    {
+        $this->iv = IvGenerator::make();
     }
 }
