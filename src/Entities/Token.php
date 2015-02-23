@@ -1,15 +1,28 @@
 <?php namespace Supared\Sentora\SingleSignOnClient\Entities;
 
+use Supared\Sentora\SingleSignOnClient\Utils\Validator as Validate;
+
 class Token
 {
 
-    private $token;
-    private $server_auth;
+    const URL_STRING_PARAMS = "ssoServInit=%s&ssoToken=%s";
 
-    public function __construct($token, $server_auth = null)
+    /**
+     * The generated (encrypted) token string.
+     * @var string 
+     */
+    private $token;
+
+    /**
+     * The target server's init auth key.
+     * @var string
+     */
+    private $server_init;
+
+    public function __construct($token, $server_init_auth)
     {
         $this->token = $token;
-        $this->server_auth = $server_auth;
+        $this->server_init = $server_init_auth;
     }
 
     /**
@@ -22,12 +35,12 @@ class Token
     }
 
     /**
-     * Returns the Sentora server init auth string.
+     * Returns the Sentora server init string.
      * @return string
      */
-    public function getServerAuth()
+    public function getServerInit()
     {
-        return $this->server_auth;
+        return $this->server_init;
     }
 
     /**
@@ -38,7 +51,8 @@ class Token
      */
     public function getTokenUrl($target_server)
     {
-        // Validate it contains the http(s):// apart!
+        Validate::serverTargetAddress($target_server);
+        return rtrim($target_server, '/') . "?" . sprintf(self::URL_STRING_PARAMS, $this->getServerInit(), $this->getToken());
     }
 
     /**

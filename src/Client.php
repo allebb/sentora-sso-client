@@ -1,31 +1,53 @@
 <?php namespace Supared\Sentora\SingleSignOnClient;
 
 use Supared\Sentora\SingleSignOnClient\Entities\Token;
-use Supared\Sentora\SingleSignOnClient\Utils\Validator;
+use Supared\Sentora\SingleSignOnClient\Utils\Validator as Validate;
 
 class Client
 {
 
-    private $server_auth;
+    const CRYPTO_CIPHER = MCRYPT_3DES;
+    const CRYPTO_MODE = MCRYPT_MODE_CBC;
+
+    /**
+     * The target server's auth init key
+     * @var string 
+     */
+    private $server_init;
+    
+    /**
+     * The encryption key as set in the Sentora SSO module.
+     * @var string
+     */
     private $key;
+    
+    /**
+     * The initiation vector as set in the Sentora SSO module.
+     * @var string
+     */
     private $iv;
+    
+    /**
+     * A timestamp value specify until which date this token can authenticate and
+     * provide SSO authentication till (format YYYYMMDDHHMM)
+     * @var int
+     */
     private $valid_till;
-    protected $validator;
 
     public function __construct()
     {
         $this->checkDependencies();
-        $this->validator = new Validator;
     }
 
     /**
-     * Set the server auth key.
+     * Set the server init key.
      * @param string $auth
      * @return \Supared\Sentora\SingleSignOnClient\Client
      */
-    public function setServerAuthKey($auth)
+    public function setServerInitKey($auth)
     {
-        $this->server_auth = $auth;
+        Validate::serverInitAuth($auth);
+        $this->server_init = $auth;
         return $this;
     }
 
@@ -36,6 +58,7 @@ class Client
      */
     public function setKey($key)
     {
+        $this->key = $key;
         return $this;
     }
 
@@ -46,6 +69,7 @@ class Client
      */
     public function setIv($iv)
     {
+        $this->iv = $iv;
         return $this;
     }
 
@@ -57,27 +81,8 @@ class Client
      */
     public function setValidTill($timestamp)
     {
-        return $this;
-    }
-
-    /**
-     * Set the user ID as it appears in the Sentora Users table.
-     * @param int $uid
-     * @return \Supared\Sentora\SingleSignOnClient\Client
-     */
-    public function setUid($uid)
-    {
-        // Validate that this is an integer!
-        return $this;
-    }
-
-    /**
-     * Set the username as it appears in the Sentora Users table.
-     * @param string $username
-     * @return \Supared\Sentora\SingleSignOnClient\Client
-     */
-    public function setUsername($username)
-    {
+        Validate::validityPeriod($timestamp);
+        $this->valid_till = $timestamp;
         return $this;
     }
 
@@ -86,10 +91,13 @@ class Client
      * output as string, URLs and HTML links.
      * @return \Supared\Sentora\SingleSignOnClient\Entities\Token
      */
-    public function generate()
+    public function generate($uid, $username)
     {
+        Validate::username($username);
+        Validate::uid($uid);
         // Generate the SSO token and then we'll pass it to the Token entity..
-        return new Token($generated_token, $server_auth);
+        $token = $this->encryptToken($uid, $username);
+        return new Token($token, $this->server_init);
     }
 
     /**
@@ -102,5 +110,12 @@ class Client
         if (!function_exists('mcrypt_encrypt')) {
             throw new \RuntimeException('The PHP mcrypt extention is required but not installed!');
         }
+    }
+
+    private function encryptToken($uid, $username)
+    {
+        $build = sprintf("uid=%u&user=%s&validtill=%s", $uid, $username, $this->valid_till);
+        $encrypt = mcrypt_encrypt(self::CRYPTO_MODE, $this->key, $data, self::CRYPTO_MODE, $this->iv);
+        return bin2hex($encrypt);
     }
 }
