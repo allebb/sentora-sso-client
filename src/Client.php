@@ -106,7 +106,7 @@ class Client
      */
     private function encryptToken($uid, $username)
     {
-        $build = sprintf("uid=%u&user=%s&validtill=%s", $uid, $username, $this->valid_till);
+        $build = sprintf("uid=%u;user=%s;validtill=%s", $uid, $username, $this->valid_till);
         $encrypt = mcrypt_encrypt(MCRYPT_3DES, $this->key, $build, MCRYPT_MODE_CBC, static::hexToAscii($this->getIv()));
         return bin2hex($encrypt);
     }
