@@ -26,25 +26,29 @@ class Validator
         if (self::isNull($uid)) {
             self::raiseValidationException("The UID cannot be empty, please set a user ID!");
         }
-        if (self::isInteger($uid)) {
+        if (!self::isInteger($uid)) {
             self::raiseValidationException("The UID must be an integer value type.");
         }
-        if (self::intLargerThan($uid, 0)) {
+        if (!self::intLargerThan($uid, 0)) {
             self::raiseValidationException("The UID must be greater than zero!");
         }
     }
 
     public static function validityPeriod($timestamp)
     {
-// Validate timestamp
-// - Is valid format YYYYMMDDHHMM
-// - Is in the future
+        if (!self::isValidDateFormat($timestamp)) {
+            self::raiseValidationException("The validity expirey timestamp must be in this format YYYYMMDDHHMM.");
+        }
+        if (!self::isDateInFuture($timestamp)) {
+            self::raiseValidationException("The validity expirey timestamp cannot be in the past.");
+        }
     }
 
     public static function serverTargetAddress($address)
     {
-// Validate URL string
-// - contains http(s)://
+        if (!self::isValidBaseUrl($address)) {
+            self::raiseValidationException("The target server address failed validation and must be formatted like: http://yourdomain.com/ or https://yourdomain.com/");
+        }
     }
 
     private static function raiseValidationException($msg)
@@ -82,5 +86,20 @@ class Validator
             return true;
         }
         return false;
+    }
+
+    private static function isValidBaseUrl($value)
+    {
+        $regex_rule =;
+    }
+
+    private static function isValidDateFormat($date)
+    {
+        return true;
+    }
+
+    private static function isDateInFuture($date)
+    {
+        return true;
     }
 }
