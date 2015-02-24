@@ -13,28 +13,74 @@ class Validator
 
     public static function username($username)
     {
-        // Validate Uername
-        // - Is not null
+        if (self::isNull($username)) {
+            self::raiseValidationException("The username cannot be empty, please set a username!");
+        }
+        if (!self::hasMoreThanCharaters($username, 1)) {
+            self::raiseValidationException("The username must contain more than 1 character!");
+        }
     }
 
     public static function uid($uid)
     {
-        // Validate User ID is an integer
-        // - Is not null
-        // - Is an integer
-        // - Is greater than zero!
+        if (self::isNull($uid)) {
+            self::raiseValidationException("The UID cannot be empty, please set a user ID!");
+        }
+        if (self::isInteger($uid)) {
+            self::raiseValidationException("The UID must be an integer value type.");
+        }
+        if (self::intLargerThan($uid, 0)) {
+            self::raiseValidationException("The UID must be greater than zero!");
+        }
     }
 
     public static function validityPeriod($timestamp)
     {
-        // Validate timestamp
-        // - Is valid format YYYYMMDDHHMM
-        // - Is in the future
+// Validate timestamp
+// - Is valid format YYYYMMDDHHMM
+// - Is in the future
     }
 
     public static function serverTargetAddress($address)
     {
-        // Validate URL string
-        // - contains http(s)://
+// Validate URL string
+// - contains http(s)://
+    }
+
+    private static function raiseValidationException($msg)
+    {
+        throw new \Supared\Sentora\SingleSignOnClient\Exceptions\ValidationException($msg);
+    }
+
+    private static function hasMoreThanCharaters($string, $chars)
+    {
+        if (strlen($string) > $chars) {
+            return true;
+        }
+        return false;
+    }
+
+    private static function isNull($string)
+    {
+        if (is_null($string) || empty($string)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static function intLargerThan($int, $than)
+    {
+        if ($int > $than) {
+            return true;
+        }
+        return false;
+    }
+
+    private static function isInteger($value)
+    {
+        if (is_int($value)) {
+            return true;
+        }
+        return false;
     }
 }
