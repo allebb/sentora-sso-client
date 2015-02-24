@@ -90,11 +90,13 @@ class Validator
 
     private static function isValidBaseUrl($value)
     {
-        $regex_rule =;
+        $regex_rule = "";
+        return true;
     }
 
     private static function isValidDateFormat($date)
     {
+        $regex_rule = "";
         return true;
     }
 
