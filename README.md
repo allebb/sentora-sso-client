@@ -1,6 +1,6 @@
 # Sentora SSO Client
 
-This library aids the generation of SSO tokens and single sign-on links/buttons for use with the [Supared SSO module](https://github.com/supared/sentora-sso-module) for the [Sentora](http://sentora.org) web hosting control panel.
+This library aids the generation of SSO tokens and single sign-on links/buttons for use with my [Sentora SSO module](https://github.com/bobsta63/sentora-sso-module) for the [Sentora](http://sentora.org) web hosting control panel.
 
 Requirements
 ------------
@@ -13,8 +13,6 @@ Installation
 
 We recommend you use Composer to install the library like so:
 
-TBC
-
 Examples
 --------
 
@@ -24,8 +22,3 @@ License
 -------
 
 This library is released under the [GPL v2 license](LICENSE).
-
-Support
--------
-
-Premium support is provided by Supared Limited. If you would like consultancy/development services to implement this into your existing solution please contact us at: hello@supared.com
