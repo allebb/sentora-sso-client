@@ -4,7 +4,7 @@
     "description": "A client library for generating SSO tokens and login buttons/links for the Sentora web hosting control panel.",
     "type": "library",
     "keywords": ["sentora", "zpanel", "sso", "token"],
-    "license": "GPL-2.0",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Bobby Allen",
